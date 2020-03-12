@@ -30,11 +30,19 @@ class indexPage extends Component {
   }
 
   getChartConfig = (sData = [], name, textY, textX) => {
-    // console.log('sData======', sData);
-
-    const names = _.map(sData, (item, key) => (key));
-    // console.log('name', names)
-
+    const orignData = sData;
+    // console.log(orignData)
+    let compareNames = _.map(sData, (item, key) => (key));
+    const max = _.max(_.map(sData, (item) => (item.length)));
+    const values = _.mapValues(sData, function (o) { return o.length; }); 
+    if (compareNames.length > 1 && !_.isEmpty(values)) {
+      for (let index = 1; index < compareNames.length; index++) {
+        if (values[compareNames[index]] === max) {
+          compareNames.unshift(compareNames[index])
+          break;
+        }
+      }
+    }
     const prepareData = (data = []) => {
       const obj = {
         list: _.map(data, item => item[1]),
@@ -44,35 +52,18 @@ class indexPage extends Component {
       obj.max = _.max(obj.list);
       return obj;
     };
-    // const yAxisData = () => {
-    //   // console.log('this.state.buyCloseSpread', _.map(this.state.buyCloseSpread, item => item[1]));
-    //   const data = [
-    //     ..._.map(sData[`BINANCE_${name}`], item => item[1]),
-    //     ..._.map(sData[`composite_${name}`], item => item[1]),
-    //     ..._.map(sData[`HUOBI_${name}`], item => item[1]),
-    //     ..._.map(sData[`OKEX_${name}`], item => item[1]),
-    //   ];
-    //   const obj = {
-    //     data,
-    //   };
-    //   // console.log('data======', data);
-    //   obj.min = _.min(obj.data);
-    //   obj.max = _.max(obj.data);
-    //   // console.log(obj);
-    //   return obj;
-    // };
-
-    const categories = _.map(sData[names[0]], item => (item[0] - 0));
+    const categories = _.map(orignData[compareNames[0]], item => (item[0] - 0));
     // console.log('categories', categories);
 
+    const names = _.map(sData, (item, key) => (key));
     const data = {};
     _.map(names, (item) => {
-      data[item] = prepareData(sData[item])
+      data[item] = prepareData(orignData[item])
     })
     // console.log(data)
-  
-    const series = _.map(sData, (item, key) => (
-       {
+
+    const series = _.map(orignData, (item, key) => (
+      {
         name: key,
         type: 'spline',
         // yAxis: 7,

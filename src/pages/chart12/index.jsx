@@ -501,8 +501,8 @@ class indexPage extends Component {
 
 
   getData = (value = '') => {
-    // getChartOneData(value).then((res) => {
-    const res = this.getRes();
+    getChartOneData(value).then((res) => {
+    // const res = this.getRes();
     if (res.code === 1200) {
       const data = res.obj;
       const obj = {};
@@ -530,7 +530,7 @@ class indexPage extends Component {
         })
       }
     }
-    // })
+    })
 
     getChartTwoData(value).then((res) => {
       if (res.code === 1200) {

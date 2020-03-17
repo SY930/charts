@@ -52,8 +52,8 @@ class indexPage extends Component {
       obj.max = _.max(obj.list);
       return obj;
     };
-    const categories = _.map(orignData[compareNames[0]], item => (item[0] - 0));
-    // console.log('categories', categories);
+    const categories = _.map(orignData[compareNames[0]], item => (item[0]));
+    console.log('categories', categories);
 
     const names = _.map(sData, (item, key) => (key));
     const data = {};
@@ -123,7 +123,7 @@ class indexPage extends Component {
         crosshair: true,
         labels: {
           formatter() {
-            return moment(this.value - 0).format('MM-DD HH:mm:ss'); // eslint-disable-line
+            return this.value // eslint-disable-line
           },
         },
       }],

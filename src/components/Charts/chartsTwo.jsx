@@ -143,7 +143,7 @@ class indexPage extends Component {
                 crosshair: true,
                 labels: {
                     formatter() {
-                        return moment(this.value - 0).format('MM-DD HH:mm:ss'); // eslint-disable-line
+                        return this.value; // eslint-disable-line
                     },
                 },
             }],
@@ -240,7 +240,7 @@ class indexPage extends Component {
                 crosshair: true,
                 labels: {
                     formatter() {
-                        return moment(this.value - 0).format('MM-DD HH:mm:ss'); // eslint-disable-line
+                        return this.value; // eslint-disable-line
                     },
                 },
             }],

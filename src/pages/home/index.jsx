@@ -756,7 +756,7 @@ class indexPage extends Component {
           obj[index]['ask'] = [];
           obj[index]['bid'] = [];
           _.map(item, (it) => {
-            const timestamp = moment(it.time001 ? it.time001 : it.createdAt).format('x') - 0;
+            const timestamp = it.time001 ? it.time001 : it.createdAt - 0;
             // console.log('obj[`key${index}`]', obj[`key${index}`], index, `key${index}`)
             obj[index].bid.push([
               timestamp,

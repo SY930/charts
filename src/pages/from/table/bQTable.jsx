@@ -130,8 +130,8 @@ class indexPage extends Component {
                                     rules: [{ required: true, message: 'Please input the cType you got!' }],
                                 })(
                                     <Select>
-                                        <Option value="C1">C1</Option>
-                                        <Option value="C0">C0</Option>
+                                        <Option value="1">C1</Option>
+                                        <Option value="0">C0</Option>
                                     </Select>
                                 )}
                             </Form.Item>

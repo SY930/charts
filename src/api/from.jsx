@@ -3,8 +3,12 @@ export function Download(values) {
     return axios.get(`/api/downLoad?sym=${values.sym}&date=${values.date}&exchange=${values.exchange}&group=${values.group}`)
 }
 
+export function DownloadStatus(group) {
+    return axios.get(`/api/downLoadStatus?group=${group}`)
+}
+
 export function Execute(values) {
-    return axios.get(`api/execute?group=${values.group}&symbol=${values.symbol}&bps=${values.bps}&btc=${values.btc}`)
+    return axios.get(`api/execute?group=${values.group}&symbol=${values.symbol}`)
 }
 
 export function getTable(values) {

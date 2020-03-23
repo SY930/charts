@@ -1,7 +1,6 @@
 import React from 'react';
 import { Menu, Layout } from 'antd';
 
-
 const { Header } = Layout;
 const { SubMenu } = Menu;
 

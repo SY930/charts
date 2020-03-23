@@ -126,7 +126,7 @@ class indexPage extends Component {
                         <Col span={6}>
                             <Form.Item label="cType">
                                 {getFieldDecorator('cType', {
-                                    initialValue: 'C1',
+                                    initialValue: '1',
                                     rules: [{ required: true, message: 'Please input the cType you got!' }],
                                 })(
                                     <Select>

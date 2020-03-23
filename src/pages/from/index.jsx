@@ -1,10 +1,42 @@
 import React, { Component } from 'react'
-import { Form, DatePicker, Input, Button, Row, Col, Breadcrumb, message } from 'antd';
-import { Download, Execute } from '../../api/from';
+import { Form, DatePicker, Input, Button, Row, Col, Breadcrumb, message, Progress } from 'antd';
+import { Download, Execute, DownloadStatus } from '../../api/from';
+import _ from 'lodash';
 
 class indexPage extends Component {
+    state = {
+        percent: 0,
+        fileName: [],
+    }
+
+    timer = {
+        handler: null,
+        interval: 3000,
+    }
+    loading = false;
+
+    componentDidMount() {
+        // const self = this;
+        // if (this.timer.handler) {
+        //     clearInterval(this.timer.handler)
+        //     this.timer.handler = null
+        // }
+
+        // this.timer.handler = setInterval(() => {
+        //     self.downloadStatus();
+        // }, this.timer.interval)
+    }
+
+    componentWillUnmount() {
+        if (this.timer.handler) {
+            clearInterval(this.timer.handler)
+            this.timer.handler = null
+        }
+    }
+
     handleSubmit = e => {
         e.preventDefault();
+
         this.props.form.validateFields(['date', 'group', 'exchange', 'sym'], (err, fieldsValue) => {
             if (err) {
                 return;
@@ -14,18 +46,48 @@ class indexPage extends Component {
                 ...fieldsValue,
                 'date': fieldsValue['date'].format('YYYY/MM/DD'),
             };
+            const exchangeLen = values.exchange.split('.').length;
+            this.loading = true;
             Download(values).then((data) => {
                 if (data.code === 1200) {
+                    const self = this;
                     message.success(data.msg);
+                    if (this.timer.handler) {
+                        clearInterval(this.timer.handler)
+                        this.timer.handler = null
+                    }
+            
+                    this.timer.handler = setInterval(() => {
+                        self.downloadStatus(values.group, exchangeLen);
+                    }, this.timer.interval)
+
                 }
             })
         });
     };
 
+
+    downloadStatus = (group, exchangeLen) => {
+        DownloadStatus(group).then((data) => {
+            if (data.code === 1200) {
+                if (data.obj.length === exchangeLen) {
+                    this.loading = false;
+                    if (this.timer.handler) {
+                        clearInterval(this.timer.handler);
+                        this.timer.handler = null;
+                    }
+                }
+                this.setState({
+                    fileName: data.obj
+                })
+            }
+        })
+    }
+
     handleExecuteSubmit = e => {
         e.preventDefault();
 
-        this.props.form.validateFields(['group_1', 'symbol', 'bps', 'btc'],(err, fieldsValue) => {
+        this.props.form.validateFields(['group', 'exchange'], (err, fieldsValue) => {
             if (err) {
                 return;
             }
@@ -33,7 +95,7 @@ class indexPage extends Component {
             // Should format date value before submit.
             const values = {
                 ...fieldsValue,
-                group: fieldsValue['group_1'],
+                symbol: fieldsValue['exchange'],
             };
             Execute(values).then((data) => {
                 if (data.code === 1200) {
@@ -96,22 +158,40 @@ class indexPage extends Component {
                             </Col>
                         </Row>
                     </Form.Item>
-                    
+
                     <Form.Item
                         wrapperCol={{
                             xs: { span: 24, offset: 0 },
                             sm: { span: 16, offset: 8 },
                         }}
                     >
-                        <Button type="primary" htmlType="submit">
+                        <Button type="primary" htmlType="submit" style={{ marginRight: 10 }} loading={this.loading}>
                             下载
                         </Button>
-
+                        <Button type="primary" onClick={this.handleExecuteSubmit}>
+                            执行
+                        </Button>
                     </Form.Item>
                 </Form>
                 <div>
-                <Form {...formItemLayout} onSubmit={this.handleExecuteSubmit}>
-                    <Form.Item label="组名">
+
+                    {/* <Form {...formItemLayout} > */}
+
+
+                    <Row gutter={8}>
+                        <Col span={6}></Col>
+                        <Col span={6}>
+                            <p>当前下载文件为：</p>
+                            {
+                                _.map(this.state.fileName || [], (item, index) => {
+                                    return (
+                                        <p key={index}>{item}</p>
+                                    )
+                                })
+                            }
+                        </Col>
+                    </Row>
+                    {/* <Form.Item label="组名">
                         <Row gutter={8}>
                             <Col span={6}>
                                 {getFieldDecorator('group_1', {
@@ -146,19 +226,9 @@ class indexPage extends Component {
                                 })(<Input placeholder="数字类型逗号分开" />)}
                             </Col>
                         </Row>
-                    </Form.Item>
-                    <Form.Item
-                        wrapperCol={{
-                            xs: { span: 24, offset: 0 },
-                            sm: { span: 16, offset: 8 },
-                        }}
-                    >
-                        <Button type="primary" htmlType="submit">
-                            执行
-                        </Button>
+                    </Form.Item> */}
 
-                    </Form.Item>
-                </Form>
+                    {/* </Form> */}
                 </div>
             </React.Fragment>
         );

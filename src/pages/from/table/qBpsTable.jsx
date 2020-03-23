@@ -53,7 +53,7 @@ class indexPage extends Component {
         super();
         this.state = {
             bidData: [],
-            askData:[],
+            askData:[] 
         }
     }
 

@@ -183,8 +183,15 @@ class indexPage extends Component {
             <Col span={4}>
               < Form.Item label="bps" >
                 {getFieldDecorator('bps', {
+                    initialValue: '1',
                   rules: [{ required: true, message: 'Please input the bps you got!' }],
-                })(<Input placeholder="整数逗号分开" />)}
+                })(
+                  <Select>
+                    <Option value="1">1</Option>
+                    <Option value="3">3</Option>
+                    <Option value="5">5</Option>
+                  </Select>
+                )}
               </Form.Item >
             </Col>
             <Col span={3}>

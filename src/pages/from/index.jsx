@@ -87,7 +87,7 @@ class indexPage extends Component {
     handleExecuteSubmit = e => {
         e.preventDefault();
 
-        this.props.form.validateFields(['group', 'exchange'], (err, fieldsValue) => {
+        this.props.form.validateFields(['group', 'sym'], (err, fieldsValue) => {
             if (err) {
                 return;
             }
@@ -95,7 +95,7 @@ class indexPage extends Component {
             // Should format date value before submit.
             const values = {
                 ...fieldsValue,
-                symbol: fieldsValue['exchange'],
+                symbol: fieldsValue['sym'],
             };
             Execute(values).then((data) => {
                 if (data.code === 1200) {
@@ -145,7 +145,7 @@ class indexPage extends Component {
                             <Col span={6}>
                                 {getFieldDecorator('exchange', {
                                     rules: [{ required: true, message: 'Please input the exchange you got!' }],
-                                })(<Input />)}
+                                })(<Input placeholder="例如 HUOBI,BINANCE,composite" />)}
                             </Col>
                         </Row>
                     </Form.Item>

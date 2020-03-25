@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Breadcrumb, Form, Button, Row, Col, Table, Input, Select } from 'antd';
-import { getBpsTable} from '../../../api/from';
+import { getBpsTable } from '../../../api/from';
 import _ from 'lodash';
 
 const { Option } = Select;
@@ -53,7 +53,7 @@ class indexPage extends Component {
         super();
         this.state = {
             bidData: [],
-            askData:[] 
+            askData: []
         }
     }
 
@@ -62,8 +62,8 @@ class indexPage extends Component {
             if (data.code === 1200 && data.obj) {
                 let ask = data.obj.ask;
                 let bid = data.obj.bid;
-                ask = _.map(ask, (item, index) => ( { ...item, id: index} ));
-                bid = _.map(bid, (item, index) => ( { ...item, id: index} ));
+                ask = _.map(ask, (item, index) => ({ ...item, id: index }));
+                bid = _.map(bid, (item, index) => ({ ...item, id: index }));
                 this.setState({
                     askData: ask,
                     bidData: bid
@@ -72,28 +72,28 @@ class indexPage extends Component {
         });
     }
 
-   
+
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFields((err, fieldsValue) => {
-          if (err) {
-            return;
-          }
-          const values = {
-            ...fieldsValue,
-          };
-          getBpsTable(values).then((data) => {
-              if (data.code === 1200 && data.obj) {
-                let ask = data.obj.ask;
-                let bid = data.obj.bid;
-                ask = _.map(ask, (item, index) => ( { ...item, id: index} ));
-                bid = _.map(bid, (item, index) => ( { ...item, id: index} ));
-                  this.setState({
-                      askData: ask,
-                      bidData: bid
-                  })
-              }
-          });
+            if (err) {
+                return;
+            }
+            const values = {
+                ...fieldsValue,
+            };
+            getBpsTable(values).then((data) => {
+                if (data.code === 1200 && data.obj) {
+                    let ask = data.obj.ask;
+                    let bid = data.obj.bid;
+                    ask = _.map(ask, (item, index) => ({ ...item, id: index }));
+                    bid = _.map(bid, (item, index) => ({ ...item, id: index }));
+                    this.setState({
+                        askData: ask,
+                        bidData: bid
+                    })
+                }
+            });
         });
     }
 
@@ -126,8 +126,15 @@ class indexPage extends Component {
                         <Col span={6}>
                             < Form.Item label="bps" >
                                 {getFieldDecorator('bps', {
+                                    initialValue: '1',
                                     rules: [{ required: true, message: 'Please input the bps you got!' }],
-                                })(<Input placeholder="" />)}
+                                })(
+                                    <Select>
+                                        <Option value="1">1</Option>
+                                        <Option value="3">3</Option>
+                                        <Option value="5">5</Option>
+                                    </Select>
+                                )}
                             </Form.Item >
                         </Col>
                         <Col span={6}>
@@ -151,14 +158,14 @@ class indexPage extends Component {
                                 }}
                             >
                                 <Button type="primary" htmlType="submit">
-                                 查询
+                                    查询
 
                                 </Button>
                             </Form.Item>
                         </Col>
                     </Row>
                 </Form >
-                <Row gutter={24} style={{ padding: '30px 10px', background: '#fff'}}>
+                <Row gutter={24} style={{ padding: '30px 10px', background: '#fff' }}>
                     <Col span={12}>
                         <Table
                             size="small"
@@ -167,18 +174,18 @@ class indexPage extends Component {
                             dataSource={this.state.bidData}
                             title={() => 'Bid'}
                             columns={columns(this)}
-                            // scroll={{ x: 1800 }}
+                        // scroll={{ x: 1800 }}
                         />
                     </Col>
                     <Col span={12}>
-                    <Table
+                        <Table
                             size="small"
                             pagination={false}
                             rowKey="id"
                             title={() => 'Ask'}
                             dataSource={this.state.askData}
                             columns={columns(this)}
-                            // scroll={{ x: 1800 }}
+                        // scroll={{ x: 1800 }}
                         />
                     </Col>
                 </Row>

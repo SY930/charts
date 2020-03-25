@@ -16,6 +16,7 @@ import bPTable from './pages/from/table/bPTable';
 import bQTable from './pages/from/table/bQTable';
 import qBpsTable from './pages/from/table/qBpsTable';
 import qBtcTable from './pages/from/table/qBtcTable';
+import DownTable from './pages/from/table/downTable'
 import * as serviceWorker from './serviceWorker';
 
 
@@ -35,6 +36,7 @@ ReactDOM.render(
                 <Route path={'/table10'} component={qBtcTable} />
                 <Route path={'/chart11'} component={Chart11} />
                 <Route path={'/chart12'} component={Chart12} />
+                <Route path={'/download13'} component={DownTable} />
             </Switch>
         </App>
     </Router>, document.getElementById('root'));

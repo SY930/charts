@@ -11483,7 +11483,7 @@ class indexPage extends Component {
               </Form.Item >
             </Col>
             <Col span={4}>
-              < Form.Item label="btc" >
+              <Form.Item label="btc" >
                 {getFieldDecorator('btc', {
                   initialValue: '1',
                   rules: [{ required: true, message: 'Please input the btc you got!' }],

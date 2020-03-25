@@ -45,3 +45,14 @@ export function getBtcTable(values) {
     }
     return axios.get(`api/reportForm_queryBtc?grpType=${values.grpType}&bps=${values.btc}&cType=${values.cType}`)
 }
+
+export function History() {
+    return axios.get(`api/getHistory`)
+
+}
+
+
+export function downDelete(values) {
+    console.log('values', values)
+    return axios.get(`api/delGroup?group=${values.group}`)
+}

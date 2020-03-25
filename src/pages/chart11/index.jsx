@@ -6394,7 +6394,7 @@ class indexPage extends Component {
         </Breadcrumb>
         <Form {...formItemLayout} onSubmit={this.handleSubmit}>
           <Row gutter={8}>
-            
+
             <Col span={3}>
               <Form.Item label="cType">
                 {getFieldDecorator('cType', {
@@ -6436,10 +6436,26 @@ class indexPage extends Component {
               </Form.Item >
             </Col>
             <Col span={4}>
-              < Form.Item label="btc" >
+              <Form.Item label="btc" >
                 {getFieldDecorator('btc', {
+                  initialValue: '1',
                   rules: [{ required: true, message: 'Please input the btc you got!' }],
-                })(<Input placeholder="数字类型逗号分开" />)}
+                })(
+                  <Select>
+                    <Option value="1">1</Option>
+                    <Option value="2">2</Option>
+                    <Option value="3">3</Option>
+                    <Option value="4">4</Option>
+                    <Option value="5">5</Option>
+                    <Option value="6">7</Option>
+                    <Option value="8">8</Option>
+                    <Option value="13">13</Option>
+                    <Option value="18">18</Option>
+                    <Option value="21">21</Option>
+                    <Option value="30">30</Option>
+                    <Option value="50">50</Option>
+                  </Select>
+                )}
               </Form.Item >
             </Col>
             <Col span={3}>

@@ -12,6 +12,9 @@ class Tab extends React.Component {
 
     componentDidMount() {
         this.navActive();
+        window.onhashchange = () => {
+            this.navActive();
+        }
     }
 
     navActive = () => {

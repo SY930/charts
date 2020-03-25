@@ -122,9 +122,9 @@ class indexPage extends Component {
             rules: [{ type: 'object', required: true, message: 'Please select time!' }],
         };
         return (
-            <React.Fragment>
+            <div style={{ minHeight: 580 }}>
                 <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>表单</Breadcrumb.Item>
+                    <Breadcrumb.Item>&nbsp;</Breadcrumb.Item>
                 </Breadcrumb>
                 <Form {...formItemLayout} onSubmit={this.handleSubmit}>
                     <Form.Item label="组名">
@@ -170,6 +170,9 @@ class indexPage extends Component {
                         </Button>
                         <Button type="primary" onClick={this.handleExecuteSubmit}>
                             执行
+                        </Button>
+                        <Button type="primary" style={{ marginLeft: 100}}>
+                            <a href="/#/download13">历史记录</a>
                         </Button>
                     </Form.Item>
                 </Form>
@@ -230,7 +233,7 @@ class indexPage extends Component {
 
                     {/* </Form> */}
                 </div>
-            </React.Fragment>
+            </div>
         );
     }
 }

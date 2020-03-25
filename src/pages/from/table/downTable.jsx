@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Table, Button, Popconfirm, message } from 'antd';
 import { Execute, downDelete, History } from '../../../api/from';
 import _ from 'lodash';
+import moment from 'moment';
 
 const columns = (app) => ([
     {
@@ -25,14 +26,20 @@ const columns = (app) => ([
         key: 'isStart',
         render: (text) => {
             if (text) {
-                return '已执行过'
+                return (<span className="_btn execute_btn">已执行过</span>)
             }
-            return '未执行过'
+            return (<span className="_btn noexecute_btn">未执行过</span>)
         }
     },
     {
         title: 'time',
-        key: 'time'
+        key: 'time',
+        render: (text) => {
+            if (!text) {
+                return moment(new Date()).format('YYYY-MM-DD')
+            }
+            return moment(text).format('YYYY-MM-DD')
+        }
     },
     {
         title: '操作',

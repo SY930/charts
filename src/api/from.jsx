@@ -7,6 +7,10 @@ export function DownloadStatus(group) {
     return axios.get(`/api/downLoadStatus?group=${group}`)
 }
 
+export function ExecuteStatus() {
+    return axios.get(`/api/executeStatus`)
+}
+
 export function Execute(values) {
     return axios.get(`api/execute?group=${values.group}&symbol=${values.symbol}`)
 }

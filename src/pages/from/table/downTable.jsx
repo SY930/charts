@@ -25,6 +25,7 @@ const columns = (app) => ([
         dataIndex: 'isStart',
         key: 'isStart',
         render: (text) => {
+            console.log('是否执行过', text)
             if (text) {
                 return (<span className="_btn execute_btn">已执行过</span>)
             }
@@ -32,9 +33,16 @@ const columns = (app) => ([
         }
     },
     {
-        title: 'time',
+        title: '文件日期',
+        dataIndex: 'date',
+        key: 'date'
+    },
+    {
+        title: '操作日期',
+        dataIndex: 'time',
         key: 'time',
         render: (text) => {
+            console.log('text', text)
             if (!text) {
                 return moment(new Date()).format('YYYY-MM-DD')
             }

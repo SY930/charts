@@ -133,6 +133,9 @@ class indexPage extends Component {
                                         <Option value="1">1</Option>
                                         <Option value="3">3</Option>
                                         <Option value="5">5</Option>
+                                        <Option value="10">10</Option>
+                                        <Option value="20">20</Option>
+                                        <Option value="40">40</Option>
                                     </Select>
                                 )}
                             </Form.Item >

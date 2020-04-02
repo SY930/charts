@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
-import { Breadcrumb, Form, Row, Col, Button, Input, Select } from 'antd';
+import { Breadcrumb, Form, Row, Col, Button, Input, Select, message } from 'antd';
 import ChartsTwo from '../../components/Charts/chartsTwo.jsx';
 import _ from 'lodash';
-import moment from 'moment';
-import { getChart4Data } from '../../api/home'
+import { getChart4Data, getRateData } from '../../api/home'
 
 const { Option } = Select;
 
@@ -13,6 +12,7 @@ class indexPage extends Component {
     this.state = {
       askData: {},
       bidData: {},
+      rateList: [],
     };
     this.mounted = false;
     this.timer = {
@@ -24,6 +24,7 @@ class indexPage extends Component {
   componentDidMount() {
     this.mounted = true;
     this.getData();
+    this.getRate();
     const self = this;
     // clearInterval(self.timer.handler);
     // self.timer.handler = setInterval(() => {
@@ -6361,6 +6362,26 @@ class indexPage extends Component {
     })
   }
 
+  getRate = (values = '') => {
+    getRateData(values).then((data) => {
+      // console.log(data)
+      const list = [];
+      if (data.code === 1200) {
+        _.map(data.obj, (v, key) => {
+          // if (key !== 'BTC') {
+          const value = `${v}${key}`
+          list.push(value)
+          // }
+        })
+        this.setState({
+          rateList: list
+        })
+      } else {
+        message.error(data.msg)
+      }
+    })
+  }
+
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, fieldsValue) => {
@@ -6371,6 +6392,7 @@ class indexPage extends Component {
         ...fieldsValue,
       };
       this.getData(values);
+      this.getRate(values);
     });
   };
 
@@ -6389,9 +6411,22 @@ class indexPage extends Component {
     };
     return (
       <React.Fragment>
-        <Breadcrumb style={{ margin: '16px 0' }}>
+        <Breadcrumb style={{ marginTop: 16 }}>
           <Breadcrumb.Item>&nbsp;</Breadcrumb.Item>
         </Breadcrumb>
+        {
+          this.state.rateList ? (
+            <Row style={{ marginBottom: 10 }}>
+              <Col span={3} offset={15} style={{ background: 'gainsboro', paddingLeft: 18 }}>
+                {
+                  _.map(this.state.rateList, (item, index) => {
+                    return (<span key={index} style={{ marginRight: 5 }}> 1 BTC = {item}</span>);
+                  })
+                }
+              </Col>
+            </Row>
+          ) : ''
+        }
         <Form {...formItemLayout} onSubmit={this.handleSubmit}>
           <Row gutter={8}>
 

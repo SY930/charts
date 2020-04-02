@@ -67,3 +67,10 @@ export function getChartSixData(values) {
     }
     return axios.get('/api/queryIncrement?cType=0&type=3')
 }
+
+export function getRateData(values) {
+    if (values) {
+        return axios.get(`/api/getCurrency?grpType=${values.grpType}`)
+    }
+    return axios.get('/api/getCurrency')
+}

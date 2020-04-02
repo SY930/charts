@@ -7,8 +7,8 @@ class indexPage extends Component {
     state = {
         percent: 0,
         fileName: [],
-        messagge: '',
-        execMessagge: '',
+        message: '',
+        execMessage: '',
         execBtn: false,
         downloadBtn: false,
     }
@@ -58,7 +58,7 @@ class indexPage extends Component {
                 ...fieldsValue,
                 'date': fieldsValue['date'].format('YYYY/MM/DD'),
             };
-            const exchangeLen = values.exchange.split('.').length;
+            // const exchangeLen = values.exchange.split('.').length;
             // this.loading = true;
             Download(values).then((data) => {
                 if (data.code === 1200) {
@@ -68,9 +68,9 @@ class indexPage extends Component {
                         clearInterval(this.timer.handler)
                         this.timer.handler = null
                     }
-            
+
                     this.timer.handler = setInterval(() => {
-                        self.downloadStatus(values.group, exchangeLen);
+                        self.downloadStatus(values.group);
                     }, this.timer.interval)
 
                 } else {
@@ -85,40 +85,39 @@ class indexPage extends Component {
     };
 
 
-    downloadStatus = (group, exchangeLen) => {
+    downloadStatus = (group) => {
         DownloadStatus(group).then((data) => {
-            if (data.code === 1200) {
-                let messagge = ''
-                if (data.obj.length >= exchangeLen) {
-                    // this.loading = false;
-                    messagge = data.msg;
-                    if (this.timer.handler) {
-                        clearInterval(this.timer.handler);
-                        this.timer.handler = null;
-                    }
-                    this.setState({ downloadBtn: false });
-                } else {
-                    messagge = data.msg;
+            let message = ''
+            if (data.code === 1200 && data.msg === '下载完成') {     
+                // console.log('data====', data)  
+                // this.loading = false;
+                message = data.msg;
+                if (this.timer.handler) {
+                    clearInterval(this.timer.handler);
+                    this.timer.handler = null;
                 }
                 this.setState({
-                    fileName: data.obj,
-                    messagge,
+                    downloadBtn: false,
                 })
+            } else if (data.code === 1200 && data.msg === '下载中')  {
+                message = data.msg;
             } else {
                 if (this.timer.handler) {
                     clearInterval(this.timer.handler);
                     this.timer.handler = null;
                 }
+                message = '下载异常';
                 message.error(data.msg);
                 this.setState({ downloadBtn: false });
             }
+            this.setState({ message,  fileName: data.obj, })
         }).catch((error) => {
             if (this.timer.handler) {
                 clearInterval(this.timer.handler);
                 this.timer.handler = null;
             }
             this.setState({ downloadBtn: false });
-            console.log('error===', error)
+            // console.log('error===', error)
         })
     }
 
@@ -143,7 +142,7 @@ class indexPage extends Component {
                         clearInterval(this.timerExec.handler)
                         this.timer.handler = null
                     }
-            
+
                     this.timerExec.handler = setInterval(() => {
                         this.executesSub();
                     }, this.timerExec.interval)
@@ -155,35 +154,35 @@ class indexPage extends Component {
                 this.setState({ execBtn: false });
                 console.log('error===', error)
             })
-         
-           
+
+
             // console.log('Received values of form: ', values);
         });
     };
 
     executesSub = () => {
         ExecuteStatus().then((data) => {
-            let execMessagge = '';
+            let execMessage = '';
             if (data.code === 1200 && data.msg === '执行完成') {
                 if (this.timerExec.handler) {
                     clearInterval(this.timerExec.handler);
                     this.timerExec.handler = null;
                 }
-                execMessagge = data.msg;
+                execMessage = data.msg;
                 this.setState({ execBtn: false });
             } else if (data.code === 1200 && data.msg === '执行中') {
-                execMessagge = data.msg;
-            }else {
+                execMessage = data.msg;
+            } else {
                 if (this.timerExec.handler) {
                     clearInterval(this.timerExec.handler);
                     this.timerExec.handler = null;
                 }
-                execMessagge = data.msg;
-                message.error(data.msg); 
+                execMessage = data.msg;
+                message.error(data.msg);
                 this.setState({ execBtn: false });
             }
-            this.setState({ execMessagge })
-         
+            this.setState({ execMessage })
+
         }).catch((error) => {
             if (this.timerExec.handler) {
                 clearInterval(this.timerExec.handler);
@@ -233,7 +232,7 @@ class indexPage extends Component {
                             <Col span={6}>
                                 {getFieldDecorator('exchange', {
                                     rules: [{ required: true, message: 'Please input the exchange you got!' }],
-                                })(<Input placeholder="例如 HUOBI,BINANCE,composite" />)}
+                                })(<Input placeholder="例如 HUOBI,BINANCE" />)}
                             </Col>
                         </Row>
                     </Form.Item>
@@ -261,26 +260,26 @@ class indexPage extends Component {
                         >
                             下载
                         </Button>
-                        <Button 
+                        <Button
                             type="primary"
                             onClick={this.handleExecuteSubmit}
                             disabled={this.state.execBtn}
                         >
                             执行
                         </Button>
-                        <Button type="primary" style={{ marginLeft: 100}}>
+                        <Button type="primary" style={{ marginLeft: 100 }}>
                             <a href="/#/download13">历史记录</a>
                         </Button>
                     </Form.Item>
                 </Form>
-                <div style={{ marginBottom: 15}}>
+                <div style={{ marginBottom: 15 }}>
                     <Row gutter={8}>
                         <Col span={7}></Col>
                         <Col span={3}>
-                            下载进度为： <span className={`${this.state.execMessagge !== '下载完成' ? 'finish' : 'unfinish'}`}>{this.state.messagge}</span>
+                            下载进度为： <span className={`${this.state.message !== '下载完成' ? 'unfinish' : 'finish'}`}>{this.state.message}</span>
                         </Col>
                         <Col span={6}>
-                            执行进度为：<span className={`${this.state.execMessagge === '执行完成' ? 'finish' : 'unfinish'}`}> {this.state.execMessagge}</span>
+                            执行进度为：<span className={`${this.state.execMessage === '执行完成' ? 'finish' : 'unfinish'}`}> {this.state.execMessage}</span>
                         </Col>
                     </Row>
                 </div>

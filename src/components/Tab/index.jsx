@@ -90,6 +90,9 @@ class Tab extends React.Component {
                         <Menu.Item key="13">
                             <a href="#/download13">下载记录</a>
                         </Menu.Item>
+                        <Menu.Item key="14">
+                            <a href="#/config14">配置</a>
+                        </Menu.Item>
                     </SubMenu>
                   
                 </Menu>

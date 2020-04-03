@@ -7,7 +7,7 @@
     "@svgr/webpack": "4.1.0",
     "@typescript-eslint/eslint-plugin": "1.6.0",
     "@typescript-eslint/parser": "1.6.0",
-    "antd": "^3.26.6",
+    "antd": "^3.9.3",
     "axios": "^0.19.1",
     "babel-eslint": "10.0.1",
     "babel-jest": "^24.8.0",
@@ -41,6 +41,7 @@
     "lodash": "^4.17.15",
     "mini-css-extract-plugin": "0.5.0",
     "moment": "^2.24.0",
+    "node-sass": "^4.13.1",
     "numeral": "^2.0.6",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.2.1",
@@ -138,5 +139,6 @@
       "react-app"
     ]
   },
-  "proxy": "http://172.16.11.196:9088"
+  "proxy": "http://172.16.11.196:9088",
+  "devDependencies": {}
 }

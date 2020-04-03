@@ -60,3 +60,21 @@ export function downDelete(values) {
     console.log('values', values)
     return axios.get(`api/delGroup?group=${values.group}`)
 }
+
+
+export function UpdateRate(values) {
+    // console.log('values', values)
+    return axios.get(`api/modifyFeeConfig?minSpread=${values.minSpread}&hitratio=${values.hitratio}&dq=${values.dq}&maker=${values.maker}&rate=${values.rate}&fees=${values.fees}`)
+}
+
+export function getFeeConfig() {
+    return axios.get('api/getFeeConfig')
+}
+
+export function delFeeConfig(ex) {
+    return axios.get(`api/delFeeConfig?ex=${ex}`)
+}
+export function addFeeConfig(values) {
+    // console.log(values)
+    return axios.get(`api/addFeeConfig?&exFee=${values}`)
+}

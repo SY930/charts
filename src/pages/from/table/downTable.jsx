@@ -25,7 +25,7 @@ const columns = (app) => ([
         dataIndex: 'isStart',
         key: 'isStart',
         render: (text) => {
-            console.log('是否执行过', text)
+            // console.log('是否执行过', text)
             if (text) {
                 return (<span className="_btn execute_btn">已执行过</span>)
             }
@@ -99,7 +99,7 @@ class IndexPage extends Component {
                 this.setState({
                     downData: _.map(res.obj || [], (item, index) => ({ ...item, id: index })),
                 }, () => {
-                    console.log('downData', this.state.downData)
+                    // console.log('downData', this.state.downData)
                 })
             }
         })

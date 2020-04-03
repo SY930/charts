@@ -33,7 +33,7 @@ class indexPage extends Component {
     this.mounted = true;
     // this.height = document.documentElement.clientHeight || document.body.clientHeight || window.innerHeight
     this.getData();
-    const self = this;
+    // const self = this;
     // clearInterval(self.timer.handler);
     // self.timer.handler = setInterval(() => {
     //   self.getData();

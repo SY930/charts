@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, DatePicker, Input, Button, Row, Col, Breadcrumb, message, Progress } from 'antd';
+import { Form, DatePicker, Input, Button, Row, Col, Breadcrumb, message } from 'antd';
 import { Download, Execute, DownloadStatus, ExecuteStatus } from '../../api/from';
 import _ from 'lodash';
 
@@ -136,7 +136,7 @@ class indexPage extends Component {
 
             Execute(values).then((data) => {
                 if (data.code === 1200) {
-                    const self = this;
+                    // const self = this;
                     message.success(data.msg);
                     if (this.timerExec.handler) {
                         clearInterval(this.timerExec.handler)

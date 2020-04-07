@@ -76,5 +76,5 @@ export function delFeeConfig(ex) {
 }
 export function addFeeConfig(values) {
     // console.log(values)
-    return axios.get(`api/addFeeConfig?&exFee=${values}`)
+    return axios.get(`api/addFeeConfig?exFee=${values}`)
 }

@@ -398,10 +398,12 @@ class config extends Component {
 
   handleTakerSave = () => { 
     const t = this.state.taker;
+    // const obj = {};
     const takers = _.map(t, (item) => {
         return `${item.exchange}_${item.exchangeVal}`
     })
-    console.log('talers', takers);
+    // obj.exFee = takers;
+    // console.log('obj', obj);
     addFeeConfig(takers).then((data) => {
       if (data.code === 1200) {
         message.success(data.msg);

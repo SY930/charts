@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import { Table, Row, Col, Form, Input, Button, Popconfirm, message } from 'antd';
 import _ from 'lodash';
+import UUID from 'uuidjs';
 
-
-import { UpdateRate, getFeeConfig, delFeeConfig, addFeeConfig } from '../../../api/from'
+import {
+  UpdateRate, getFeeConfig, delFeeConfig, addFeeConfig, GetRates, DelRate, addRateConfig,
+} from '../../../api/from'
 
 
 const getColumnsSimpel = (app) => {
@@ -26,8 +28,8 @@ const getColumnsSimpel = (app) => {
       dataIndex: 'operation',
       render: (text, record) =>
         app.state.taker.length >= 1 ? (
-          <Popconfirm title="Sure to delete?" onConfirm={() => app.handleDelete(record)}>
-            <a>Delete</a>
+          <Popconfirm title="确定要删除吗?" onConfirm={() => app.handleDelete(record)}>
+            <a>删除</a>
           </Popconfirm>
         ) : null,
     },
@@ -91,6 +93,51 @@ const getColumns = (app) => {
         </Button>
       )
     }]
+  const list = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: record => ({
+        record,
+        editable: col.editable,
+        dataIndex: col.dataIndex,
+        title: col.title,
+        handleSave: app.handleSave,
+      }),
+    };
+  });
+  return list;
+}
+
+
+const getColumnsRate = (app) => {
+  const columns = [
+    {
+      title: 'symbol',
+      dataIndex: 'symbol',
+      key: 'symbol',
+      // width: '30%',
+      editable: true,
+    },
+    {
+      title: '值',
+      dataIndex: 'symbolVal',
+      key: 'symbolVal',
+      // width: '30%',
+      editable: true,
+    }, {
+      title: '操作',
+      dataIndex: 'operation',
+      render: (text, record) =>
+        app.state.rate.length >= 1 ? (
+          <Popconfirm title="确定要删除吗?" onConfirm={() => app.handleRateDelete(record)}>
+            <a>删除</a>
+          </Popconfirm>
+        ) : null,
+    },
+  ];
   const list = columns.map((col) => {
     if (!col.editable) {
       return col;
@@ -213,6 +260,7 @@ class config extends Component {
     tableList: [],
     taker: [],
     count: 0,
+    rate: [],
   };
 
   // formItemKey = { keys: 0 };
@@ -226,8 +274,25 @@ class config extends Component {
 
   componentDidMount() {
     this.getData();
+    this.getRate();
   }
 
+  getRate = () => {
+    GetRates().then((data) => {
+      if (data.code === 1200) {
+        const rateList = _.map(data.obj, (v, k) => {
+          const key = UUID.genV4().hexString;
+          return { symbol: k, symbolVal: v, key, type: 'rate' }
+        })
+        console.log(rateList, 'rateList')
+        this.setState({ rate: rateList });
+      } else {
+        message.error(data.msg);
+      }
+    }).catch((err) => {
+      message.error(err);
+    })
+  }
   // initialKeys = () => {
   //   const { form } = this.props;
   //   const taker = _.map(this.state.taker, (item, index) => {
@@ -251,13 +316,15 @@ class config extends Component {
       if (res.code === 1200) {
         let tableList = [];
         const taker = _.map(res.obj.exchangeTaker, (v, k) => {
-          const id = `${+new Date()}${(Math.random() * 1000) + 1}` - 0;
+          const id = UUID.genV4().hexString;
           return { exchange: k, exchangeVal: v, id, type: 'taker' }
         })
-        res.obj.id = 8;
+        res.obj.key = `${+new Date()}${(Math.random() * 1000) + 1}` - 0;
         tableList.push(res.obj);
         console.log('object', tableList, taker)
-        this.setState({ tableList, taker, count: taker.length });
+        this.setState({ tableList, taker });
+      } else {
+        message.error(res.msg);
       }
     }).catch((err) => {
       console.log(err);
@@ -290,7 +357,7 @@ class config extends Component {
         let taker = [];
         if (data.obj.exchangeTaker) {
           taker = _.map(data.obj.exchangeTaker, (v, k) => {
-            const id = `${+new Date()}${(Math.random() * 1000) + 1}` - 0;
+            const id = UUID.genV4().hexString;
             return { exchange: k, exchangeVal: v, id, type: 'taker' }
           })
           console.log('taker', taker)
@@ -303,6 +370,33 @@ class config extends Component {
       console.log(err);
     })
   }
+
+  handleDeleteRate = (row) => {
+    DelRate(row.symbol).then((data) => {
+      if (data.code === 1200) {
+        message.success(data.msg);
+        let rate = [];
+        if (data.obj) {
+          rate = _.map(data.obj, (v, k) => {
+            const key = UUID.genV4().hexString;
+            return { symbol: k, symbolVal: v, key, type: 'rate' }
+          })
+        }
+        this.setState({ rate });
+      } else if (data.code !== 1200) {
+        message.error(data.msg)
+      }
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
+  handleRateDelete = row => {
+    const rate = [...this.state.rate];
+    this.handleDeleteRate(row);
+    this.setState({ rate: rate.filter(item => item.id !== row.id) });
+  }
+
 
   handleDelete = row => {
     const taker = [...this.state.taker];
@@ -319,9 +413,17 @@ class config extends Component {
       this.setState({
         taker: newData,
       });
+    } else if (row.type === 'rate') {
+      const newData = [...this.state.rate];
+      const index = newData.findIndex(item => row.key === item.key);
+      const item = newData[index];
+      newData.splice(index, 1, { ...item, ...row });
+      this.setState({
+        rate: newData,
+      });
     } else {
       const newData = [...this.state.tableList];
-      const index = newData.findIndex(item => row.id === item.id);
+      const index = newData.findIndex(item => row.key === item.key);
       const item = newData[index];
       newData.splice(index, 1, { ...item, ...row });
       this.setState({
@@ -330,10 +432,24 @@ class config extends Component {
     }
   };
 
+  handleRateAdd = () => {
+    const { rate } = this.state;
+    const newData = {
+      key: UUID.genV4().hexString,
+      symbol: '',
+      symbolVal: '',
+      type: 'rate',
+    }; console.log('newData', newData)
+    this.setState({
+      rate: [...rate, newData],
+      // count: count + 1,
+    });
+  }
+
   handleAdd = () => {
     const { taker } = this.state;
     const newData = {
-      id: `${+new Date()}${(Math.random() * 1000) + 1}` - 0,
+      id: UUID.genV4().hexString,
       exchange: '',
       exchangeVal: '',
       type: 'taker',
@@ -385,7 +501,7 @@ class config extends Component {
       if (data.code === 1200) {
         message.success(data.msg);
         let tableList = [];
-        data.obj.id = 8;
+        data.obj.key = `${+new Date()}${(Math.random() * 1000) + 1}` - 0;
         tableList.push(data.obj);
         this.setState({ tableList })
       } else {
@@ -396,11 +512,38 @@ class config extends Component {
     })
   }
 
-  handleTakerSave = () => { 
+  handleRateSave = () => {
+    const r = this.state.rate;
+    // const obj = {};
+    const rates = _.map(r, (item) => {
+      return `${item.symbol}_${item.symbolVal}`
+    })
+    // obj.exFee = takers;
+    // console.log('obj', obj);
+    addRateConfig(rates).then((data) => {
+      if (data.code === 1200) {
+        message.success(data.msg);
+        let rate = [];
+        if (data.obj) {
+          rate = _.map(data.obj, (v, k) => {
+            const key = UUID.genV4().hexString;
+            return { symbol: k, symbolVal: v, key, type: 'rate' }
+          })
+        }
+        this.setState({ rate });
+      } else if (data.code !== 1200) {
+        message.error(data.msg)
+      }
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
+  handleTakerSave = () => {
     const t = this.state.taker;
     // const obj = {};
     const takers = _.map(t, (item) => {
-        return `${item.exchange}_${item.exchangeVal}`
+      return `${item.exchange}_${item.exchangeVal}`
     })
     // obj.exFee = takers;
     // console.log('obj', obj);
@@ -410,7 +553,7 @@ class config extends Component {
         let taker = [];
         if (data.obj.exchangeTaker) {
           taker = _.map(data.obj.exchangeTaker, (v, k) => {
-            const id = `${+new Date()}${(Math.random() * 1000) + 1}` - 0;
+            const id = UUID.genV4().hexString;
             return { exchange: k, exchangeVal: v, id, type: 'taker' }
           })
           console.log('taker', taker)
@@ -471,31 +614,35 @@ class config extends Component {
               components={this.components}
               size="small"
               pagination={false}
-              rowKey="id"
+              rowKey="key"
               rowClassName={() => 'editable-row'}
               dataSource={this.state.tableList}
               columns={getColumns(this)}
             // scroll={{ x: 1800 }}
             />
             <div style={{ marginTop: 20 }}>
-              {/* <Form onSubmit={this.handleSubmit}>
-                {formItems}
-                <Form.Item>
-                  <Button type="dashed" onClick={this.add} style={{ width: '60%' }}>
-                    <Icon type="plus" /> Add field
-                 </Button>
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Submit
-                 </Button>
-                </Form.Item>
-              </Form> */}
+              <Button onClick={this.handleRateAdd} type="primary" style={{ marginBottom: 16, marginRight: 10 }}>
+                添加
+            </Button>
+              <Button onClick={this.handleRateSave} type="primary" style={{ marginBottom: 16 }}>
+                保存
+            </Button>
+              <Table
+                size="small"
+                pagination={false}
+                components={this.components}
+                rowClassName={() => 'editable-row'}
+                // bordered
+                rowKey="key"
+                dataSource={this.state.rate}
+                columns={getColumnsRate(this)}
+                scroll={{ y: 400 }}
+              />
             </div>
           </Col>
           <Col span={10}>
             <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16, marginRight: 10 }}>
-              Add a row
+              添加
             </Button>
             <Button onClick={this.handleTakerSave} type="primary" style={{ marginBottom: 16 }}>
               保存
@@ -513,6 +660,7 @@ class config extends Component {
             />
           </Col>
         </Row>
+
       </div>
     )
   }

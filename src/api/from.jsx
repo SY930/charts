@@ -78,3 +78,16 @@ export function addFeeConfig(values) {
     // console.log(values)
     return axios.get(`api/addFeeConfig?exFee=${values}`)
 }
+
+
+export function GetRates() {
+    return axios.get('api/queryRate');
+}
+
+export function DelRate(currency) {
+    return axios.get(`api/delRate?currency=${currency}`)
+}
+
+export function addRateConfig(values) {
+    return axios.get(`api/addRate?rate=${values}`)
+}

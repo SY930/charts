@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Table, Row, Col, Form, Input, Button, Popconfirm, message } from 'antd';
 import _ from 'lodash';
-import UUID from 'uuidjs';
+
 
 import {
   UpdateRate, getFeeConfig, delFeeConfig, addFeeConfig, GetRates, DelRate, addRateConfig,
@@ -18,7 +18,7 @@ const getColumnsSimpel = (app) => {
       editable: true,
     },
     {
-      title: '值',
+      title: '值（bps）',
       dataIndex: 'exchangeVal',
       key: 'exchangeVal',
       // width: '30%',
@@ -122,7 +122,7 @@ const getColumnsRate = (app) => {
       editable: true,
     },
     {
-      title: '值',
+      title: '值（btc）',
       dataIndex: 'symbolVal',
       key: 'symbolVal',
       // width: '30%',
@@ -150,6 +150,7 @@ const getColumnsRate = (app) => {
         dataIndex: col.dataIndex,
         title: col.title,
         handleSave: app.handleSave,
+        handleCheck: app.handleCheck,
       }),
     };
   });
@@ -199,6 +200,7 @@ class EditableCell extends React.Component {
       record,
       index,
       handleSave,
+      handleCheck,
       ...restProps
     } = this.props;
     return (
@@ -217,6 +219,20 @@ class EditableCell extends React.Component {
                       rules: [{
                         required: true,
                         message: `${title}不能为空`,
+                      }, {
+                        validator: (role, value, cb) => {
+                          if (role.field === 'exchangeVal'
+                            || role.field === 'maker'
+                            || role.field === 'rate'
+                            || role.field === 'fees'
+                            || role.field === 'hitratio') {
+                            const reg = /^[1-9]+[0-9]*$/;
+                            if (!reg.test(value)) {
+                              cb('必须是整数')
+                            }
+                          }
+                          cb();
+                        }
                       }],
                       initialValue: record[dataIndex],
                     })(
@@ -281,16 +297,17 @@ class config extends Component {
     GetRates().then((data) => {
       if (data.code === 1200) {
         const rateList = _.map(data.obj, (v, k) => {
-          const key = UUID.genV4().hexString;
+          // const key = UUID.genV4().hexString;
+          const key = `${+new Date()}-${(Math.random() * 1000) + 1}`;
           return { symbol: k, symbolVal: v, key, type: 'rate' }
         })
-        console.log(rateList, 'rateList')
-        this.setState({ rate: rateList });
+        // console.log(rateList, 'rateList')
+        this.setState({ rate: _.orderBy(rateList, (item) => item.symbol.toLowerCase()) });
       } else {
         message.error(data.msg);
       }
     }).catch((err) => {
-      message.error(err);
+      console.log(err);
     })
   }
   // initialKeys = () => {
@@ -316,10 +333,11 @@ class config extends Component {
       if (res.code === 1200) {
         let tableList = [];
         const taker = _.map(res.obj.exchangeTaker, (v, k) => {
-          const id = UUID.genV4().hexString;
+          // const id = UUID.genV4().hexString;
+          const id = `${+new Date()}-${(Math.random() * 1000) + 1}`;
           return { exchange: k, exchangeVal: v, id, type: 'taker' }
         })
-        res.obj.key = `${+new Date()}${(Math.random() * 1000) + 1}` - 0;
+        res.obj.key = `${+new Date()}-${(Math.random() * 1000) + 1}`;
         tableList.push(res.obj);
         console.log('object', tableList, taker)
         this.setState({ tableList, taker });
@@ -350,6 +368,12 @@ class config extends Component {
     }
   })
 
+
+  handleCheck = (rule, value, callback) => {
+    console.log('========', rule, value, callback);
+    callback();
+  }
+
   handleDeleteTaker = (row) => {
     delFeeConfig(row.exchange).then((data) => {
       if (data.code === 1200) {
@@ -357,7 +381,8 @@ class config extends Component {
         let taker = [];
         if (data.obj.exchangeTaker) {
           taker = _.map(data.obj.exchangeTaker, (v, k) => {
-            const id = UUID.genV4().hexString;
+            // const id = UUID.genV4().hexString;
+            const id = `${+new Date()}-${(Math.random() * 1000) + 1}`;
             return { exchange: k, exchangeVal: v, id, type: 'taker' }
           })
           console.log('taker', taker)
@@ -375,14 +400,15 @@ class config extends Component {
     DelRate(row.symbol).then((data) => {
       if (data.code === 1200) {
         message.success(data.msg);
-        let rate = [];
-        if (data.obj) {
-          rate = _.map(data.obj, (v, k) => {
-            const key = UUID.genV4().hexString;
-            return { symbol: k, symbolVal: v, key, type: 'rate' }
-          })
-        }
-        this.setState({ rate });
+        // let rate = [];
+        // if (data.obj) {
+        //   rate = _.map(data.obj, (v, k) => {
+        //     const key = UUID.genV4().hexString;
+        //     // const key = `${+new Date()}-${(Math.random() * 1000) + 1}`;
+        //     return { symbol: k, symbolVal: v, key, type: 'rate' }
+        //   })
+        // }
+        // this.setState({ rate: _.sortBy(rate, item => item.symbol.toLowerCase()) });
       } else if (data.code !== 1200) {
         message.error(data.msg)
       }
@@ -394,7 +420,8 @@ class config extends Component {
   handleRateDelete = row => {
     const rate = [...this.state.rate];
     this.handleDeleteRate(row);
-    this.setState({ rate: rate.filter(item => item.id !== row.id) });
+    // console.log('object====', row, rate);
+    this.setState({ rate: rate.filter(item => item.key !== row.key) });
   }
 
 
@@ -435,7 +462,8 @@ class config extends Component {
   handleRateAdd = () => {
     const { rate } = this.state;
     const newData = {
-      key: UUID.genV4().hexString,
+      // key: UUID.genV4().hexString,
+      key: `${+new Date()}-${(Math.random() * 1000) + 1}`,
       symbol: '',
       symbolVal: '',
       type: 'rate',
@@ -449,7 +477,7 @@ class config extends Component {
   handleAdd = () => {
     const { taker } = this.state;
     const newData = {
-      id: UUID.genV4().hexString,
+      id: `${+new Date()}-${(Math.random() * 1000) + 1}`,
       exchange: '',
       exchangeVal: '',
       type: 'taker',
@@ -501,7 +529,7 @@ class config extends Component {
       if (data.code === 1200) {
         message.success(data.msg);
         let tableList = [];
-        data.obj.key = `${+new Date()}${(Math.random() * 1000) + 1}` - 0;
+        data.obj.key = `${+new Date()}-${(Math.random() * 1000) + 1}`;
         tableList.push(data.obj);
         this.setState({ tableList })
       } else {
@@ -526,11 +554,12 @@ class config extends Component {
         let rate = [];
         if (data.obj) {
           rate = _.map(data.obj, (v, k) => {
-            const key = UUID.genV4().hexString;
+            // const key = UUID.genV4().hexString;
+            const key = `${+new Date()}-${(Math.random() * 1000) + 1}`;
             return { symbol: k, symbolVal: v, key, type: 'rate' }
           })
         }
-        this.setState({ rate });
+        this.setState({ rate: _.sortBy(rate, (item) => item.symbol.toLowerCase()) });
       } else if (data.code !== 1200) {
         message.error(data.msg)
       }
@@ -553,7 +582,8 @@ class config extends Component {
         let taker = [];
         if (data.obj.exchangeTaker) {
           taker = _.map(data.obj.exchangeTaker, (v, k) => {
-            const id = UUID.genV4().hexString;
+            // const id = UUID.genV4().hexString;
+            const id = `${+new Date()}-${(Math.random() * 1000) + 1}`;
             return { exchange: k, exchangeVal: v, id, type: 'taker' }
           })
           console.log('taker', taker)
@@ -621,6 +651,7 @@ class config extends Component {
             // scroll={{ x: 1800 }}
             />
             <div style={{ marginTop: 20 }}>
+              <h4>各个币种与btc的汇率</h4>
               <Button onClick={this.handleRateAdd} type="primary" style={{ marginBottom: 16, marginRight: 10 }}>
                 添加
             </Button>
@@ -641,6 +672,7 @@ class config extends Component {
             </div>
           </Col>
           <Col span={10}>
+            <h4>交易所的takerFee</h4>
             <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16, marginRight: 10 }}>
               添加
             </Button>
